@@ -15,7 +15,6 @@ import dagger.android.support.DaggerFragment;
 
 
 public abstract class BaseFragment extends DaggerFragment {
-
     private Unbinder unbinder;
     private AppCompatActivity activity;
 

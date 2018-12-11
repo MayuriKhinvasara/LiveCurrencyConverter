@@ -16,6 +16,6 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         if (savedInstanceState == null)
-            supportFragmentManager.beginTransaction().add(R.id.screenContainer, ListFragment()).commit()
+            supportFragmentManager.beginTransaction().add(R.id.mainActivity, ListFragment()).commit()
     }
 }

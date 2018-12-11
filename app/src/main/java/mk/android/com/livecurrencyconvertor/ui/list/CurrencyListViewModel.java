@@ -12,26 +12,27 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
-import mk.android.com.livecurrencyconvertor.data.model.Repo;
-import mk.android.com.livecurrencyconvertor.data.rest.RepoRepository;
+import mk.android.com.livecurrencyconvertor.data.model.Currency;
+import mk.android.com.livecurrencyconvertor.data.rest.CurrencyRepository;
+import mk.android.com.livecurrencyconvertor.util.Mappers;
 
-public class ListViewModel extends ViewModel {
+public class CurrencyListViewModel extends ViewModel {
 
-    private final RepoRepository repoRepository;
+    private final CurrencyRepository currencyRepository;
     private CompositeDisposable disposable;
 
-    private final MutableLiveData<List<Repo>> repos = new MutableLiveData<>();
+    private final MutableLiveData<List<Currency>> repos = new MutableLiveData<>();
     private final MutableLiveData<Boolean> repoLoadError = new MutableLiveData<>();
     private final MutableLiveData<Boolean> loading = new MutableLiveData<>();
 
     @Inject
-    public ListViewModel(RepoRepository repoRepository) {
-        this.repoRepository = repoRepository;
+    public CurrencyListViewModel(CurrencyRepository currencyRepository) {
+        this.currencyRepository = currencyRepository;
         disposable = new CompositeDisposable();
         fetchRepos();
     }
 
-    LiveData<List<Repo>> getRepos() {
+    LiveData<List<Currency>> getRepos() {
         return repos;
     }
     LiveData<Boolean> getError() {
@@ -43,10 +44,14 @@ public class ListViewModel extends ViewModel {
 
     private void fetchRepos() {
         loading.setValue(true);
-        disposable.add(repoRepository.getRepositories().subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()).subscribeWith(new DisposableSingleObserver<List<Repo>>() {
+        disposable.add(
+            currencyRepository.getCurrency()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(Mappers::mapRemoteToLocal)
+                .subscribeWith(new DisposableSingleObserver<List<Currency>>() {
                     @Override
-                    public void onSuccess(List<Repo> value) {
+                    public void onSuccess(List<Currency> value) {
                         repoLoadError.setValue(false);
                         repos.setValue(value);
                         loading.setValue(false);

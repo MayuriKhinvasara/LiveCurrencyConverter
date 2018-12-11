@@ -9,18 +9,17 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import mk.android.com.livecurrencyconvertor.R;
 import mk.android.com.livecurrencyconvertor.base.BaseFragment;
-import mk.android.com.livecurrencyconvertor.data.model.Repo;
-import mk.android.com.livecurrencyconvertor.ui.detail.DetailsFragment;
-import mk.android.com.livecurrencyconvertor.ui.detail.DetailsViewModel;
+import mk.android.com.livecurrencyconvertor.data.model.Currency;
 import mk.android.com.livecurrencyconvertor.util.ViewModelFactory;
 
-public class ListFragment extends BaseFragment implements RepoSelectedListener {
+public class ListFragment extends BaseFragment implements CurrencySelectedListener {
 
     @BindView(R.id.recyclerView)
     RecyclerView listView;
@@ -31,30 +30,27 @@ public class ListFragment extends BaseFragment implements RepoSelectedListener {
 
     @Inject
     ViewModelFactory viewModelFactory;
-    private ListViewModel viewModel;
+    private CurrencyListViewModel viewModel;
 
     @Override
     protected int layoutRes() {
-        return R.layout.screen_list;
+        return R.layout.list_currency;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(ListViewModel.class);
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(CurrencyListViewModel.class);
 
         listView.addItemDecoration(new DividerItemDecoration(getBaseActivity(), DividerItemDecoration.VERTICAL));
-        listView.setAdapter(new RepoListAdapter(viewModel, this, this));
+        listView.setAdapter(new CurrencyListAdapter(viewModel, this, this));
         listView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         observableViewModel();
     }
 
     @Override
-    public void onRepoSelected(Repo repo) {
-        DetailsViewModel detailsViewModel = ViewModelProviders.of(getBaseActivity(), viewModelFactory).get(DetailsViewModel.class);
-        detailsViewModel.setSelectedRepo(repo);
-        getBaseActivity().getSupportFragmentManager().beginTransaction().replace(R.id.screenContainer, new DetailsFragment())
-                .addToBackStack(null).commit();
+    public void onRepoSelected(Currency currency) {
+        Toast.makeText(this.getContext(), " You selected : "+currency.name(),Toast.LENGTH_SHORT);
     }
 
     private void observableViewModel() {
