@@ -5,7 +5,6 @@ import android.support.v7.widget.AppCompatEditText;
 import android.util.AttributeSet;
 
 import mk.android.com.livecurrencyconvertor.ui.list.CurrencyUpdatedListener;
-import mk.android.com.livecurrencyconvertor.util.Constants;
 import mk.android.com.livecurrencyconvertor.util.Mappers;
 
 /**
@@ -51,8 +50,7 @@ public class UserInputListenerEditText extends AppCompatEditText {
                 return;
             }
             Double amount = Mappers.parseDouble(s.toString());
-            if (amount > Constants.DEFAULT_CURRENCY_BASE_AMOUNT)
-                currencyUpdatedListener.onAmountUpdated(amount);
+            currencyUpdatedListener.onAmountUpdated(amount);
         }
     }
 

@@ -17,12 +17,23 @@
         android:id="@+id/textViewCurrency"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
         android:layout_toEndOf="@+id/imageViewFlag"
         android:textSize="18sp"
+        android:textColor="@android:color/black"
         android:textStyle="bold"
         tools:text="EUR" />
 
+    <TextView
+        android:id="@+id/textViewCurrencyFullName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/imageViewFlag"
+        android:layout_below="@id/textViewCurrency"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="13sp"
+        tools:text="EUR" />
+
+    <!-- Custom type to respond to user input -->
     <mk.android.com.livecurrencyconvertor.ui.util.UserInputListenerEditText
         android:id="@+id/editTextCurrencyAmount"
         android:layout_width="wrap_content"

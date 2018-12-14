@@ -21,21 +21,21 @@ import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subscribers.DisposableSubscriber;
 import mk.android.com.livecurrencyconvertor.data.model.Currency;
 import mk.android.com.livecurrencyconvertor.data.rest.CurrencyRepository;
-import mk.android.com.livecurrencyconvertor.util.Constants;
+import mk.android.com.livecurrencyconvertor.util.ConstantsKt;
 import mk.android.com.livecurrencyconvertor.util.Mappers;
+
 
 public class CurrencyListViewModel extends ViewModel {
 
     private static final long CURRENCY_REFRESH_INTERVAL_SECONDS = 1;
-    private static final double DEFAULT_AMOUNT = 1.0D;
     private final CurrencyRepository currencyRepository;
     private DisposableSubscriber<List<Currency>> disposableSubscriber;
 
     private final MutableLiveData<List<Currency>> currencies = new MutableLiveData<>();
     private final MutableLiveData<Boolean> currencyLoadError = new MutableLiveData<>();
     private final MutableLiveData<Boolean> loading = new MutableLiveData<>();
-    private String currentBase = Constants.DEFAULT_CURRENCY_BASE;
-    private double amount = Constants.DEFAULT_CURRENCY_BASE_AMOUNT;
+    private String currentBase = ConstantsKt.getDEFAULT_CURRENCY_BASE();
+    private double amount = ConstantsKt.getDEFAULT_CURRENCY_BASE_AMOUNT();
 
     @Inject
     public CurrencyListViewModel(CurrencyRepository currencyRepository) {
@@ -72,7 +72,7 @@ public class CurrencyListViewModel extends ViewModel {
                     })
                     .observeOn(Schedulers.io())
                     .map(list -> {
-                        return ((amount != DEFAULT_AMOUNT) ? convertCurrency(list, amount) : list);
+                        return ((amount != ConstantsKt.getDEFAULT_CURRENCY_BASE_AMOUNT()) ? convertCurrency(list, amount) : list);
                     })
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(disposableSubscriber);
@@ -122,7 +122,7 @@ public class CurrencyListViewModel extends ViewModel {
 
     public void setSelectedCurrency(String base) {
         currentBase = base;
-        amount = DEFAULT_AMOUNT;
+        amount = ConstantsKt.getDEFAULT_CURRENCY_BASE_AMOUNT();
     }
 
     public void setUpdatedAmount(Double newAmount) {

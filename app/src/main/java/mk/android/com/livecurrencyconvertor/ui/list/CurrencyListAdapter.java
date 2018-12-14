@@ -17,6 +17,7 @@ import butterknife.ButterKnife;
 import mk.android.com.livecurrencyconvertor.R;
 import mk.android.com.livecurrencyconvertor.data.model.Currency;
 import mk.android.com.livecurrencyconvertor.ui.util.UserInputListenerEditText;
+import mk.android.com.livecurrencyconvertor.util.CurrencyUtil;
 
 public class CurrencyListAdapter extends RecyclerView.Adapter<CurrencyListAdapter.CurrencyViewHolder> {
 
@@ -58,9 +59,10 @@ public class CurrencyListAdapter extends RecyclerView.Adapter<CurrencyListAdapte
 
     static final class CurrencyViewHolder extends RecyclerView.ViewHolder {
 
-        //   private final MyCustomEditTextListener myCustomEditTextListener;
         @BindView(R.id.textViewCurrency)
         TextView textViewCurrency;
+        @BindView(R.id.textViewCurrencyFullName)
+        TextView textViewCurrencyFullName;
         @BindView(R.id.editTextCurrencyAmount)
         UserInputListenerEditText editTextCurrencyAmount;
         @BindView(R.id.imageViewFlag)
@@ -81,9 +83,12 @@ public class CurrencyListAdapter extends RecyclerView.Adapter<CurrencyListAdapte
 
         void bind(Currency currency) {
             this.currency = currency;
+
             textViewCurrency.setText(currency.name());
             editTextCurrencyAmount.setText(String.format("%.2f", currency.value()));
-            //  imageViewFlag.setText(String.valueOf(currency.name()));
+
+            imageViewFlag.setImageResource(CurrencyUtil.INSTANCE.getFlagImageResByISO(currency.name()));
+            textViewCurrencyFullName.setText(CurrencyUtil.INSTANCE.getCurrencyNameResByISO(currency.name()));
         }
     }
 
