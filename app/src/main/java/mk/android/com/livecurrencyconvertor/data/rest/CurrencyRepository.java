@@ -14,8 +14,8 @@ public class CurrencyRepository {
         this.currencyService = currencyService;
     }
 
-    public Single<CurrencyBaseDTO> getCurrency() {
-        return currencyService.getRepositories("EUR");
+    public Single<CurrencyBaseDTO> getCurrency(String currentBase) {
+        return currencyService.getRepositories(currentBase);
     }
 
 }

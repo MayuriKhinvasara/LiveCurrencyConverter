@@ -3,7 +3,9 @@ package mk.android.com.livecurrencyconvertor.ui.list;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
+import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -25,6 +27,7 @@ import mk.android.com.livecurrencyconvertor.util.Mappers;
 public class CurrencyListViewModel extends ViewModel {
 
     private static final long CURRENCY_REFRESH_INTERVAL_SECONDS = 1;
+    private static final double DEFAULT_AMOUNT = 1.0D;
     private final CurrencyRepository currencyRepository;
     private DisposableSubscriber<List<Currency>> disposableSubscriber;
 
@@ -32,6 +35,7 @@ public class CurrencyListViewModel extends ViewModel {
     private final MutableLiveData<Boolean> currencyLoadError = new MutableLiveData<>();
     private final MutableLiveData<Boolean> loading = new MutableLiveData<>();
     private String currentBase = Constants.DEFAULT_CURRENCY_BASE;
+    private double amount = Constants.DEFAULT_CURRENCY_BASE_AMOUNT;
 
     @Inject
     public CurrencyListViewModel(CurrencyRepository currencyRepository) {
@@ -56,19 +60,34 @@ public class CurrencyListViewModel extends ViewModel {
 
         Scheduler scheduler = Schedulers.from(Executors.newSingleThreadExecutor());
         /* Use rx flowable interval function to do periodic updates */
-        Flowable.interval(0,CURRENCY_REFRESH_INTERVAL_SECONDS, TimeUnit.SECONDS)
+
+        Flowable.interval(0, CURRENCY_REFRESH_INTERVAL_SECONDS, TimeUnit.SECONDS)
                     .subscribeOn(scheduler)
                     .mergeWith(publishSubject.toFlowable(BackpressureStrategy.DROP))
                     .onBackpressureDrop()
                     .concatMap(n -> {
-                           return currencyRepository.getCurrency()
-                                    .map(currencyBaseDTO -> Mappers.mapRemoteToLocal(currencyBaseDTO, currentBase))
-                                    .toFlowable();
-                                   })
+                        return currencyRepository.getCurrency(currentBase)
+                                .map(currencyBaseDTO -> Mappers.mapRemoteToLocal(currencyBaseDTO, currentBase))
+                                .toFlowable();
+                    })
+                    .observeOn(Schedulers.io())
+                    .map(list -> {
+                        return ((amount != DEFAULT_AMOUNT) ? convertCurrency(list, amount) : list);
+                    })
                     .observeOn(AndroidSchedulers.mainThread())
-                    .retry(3)
-                    .subscribe(disposableSubscriber);
+                    .subscribeWith(disposableSubscriber);
         }
+
+    @NonNull
+    private List<Currency> convertCurrency(List<Currency> list, double amount) {
+        //Sample code to modify as per amount
+        List<Currency> modifiedList = new ArrayList<>();
+        for (Currency c : list) {
+            Currency currency = Currency.builder().setName(c.name()).setValue(c.value() * amount).build();
+            modifiedList.add(currency);
+        }
+        return modifiedList;
+    }
 
     private DisposableSubscriber<List<Currency>> getSubscriber() {
         /* Subscriber to update the data at regular intervals */
@@ -99,5 +118,14 @@ public class CurrencyListViewModel extends ViewModel {
         if (disposableSubscriber != null) {
             disposableSubscriber.dispose();
         }
+    }
+
+    public void setSelectedCurrency(String base) {
+        currentBase = base;
+        amount = DEFAULT_AMOUNT;
+    }
+
+    public void setUpdatedAmount(Double newAmount) {
+        amount = newAmount;
     }
 }

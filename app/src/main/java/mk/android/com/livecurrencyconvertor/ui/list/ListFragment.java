@@ -9,7 +9,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import javax.inject.Inject;
 
@@ -19,7 +18,7 @@ import mk.android.com.livecurrencyconvertor.base.BaseFragment;
 import mk.android.com.livecurrencyconvertor.data.model.Currency;
 import mk.android.com.livecurrencyconvertor.util.ViewModelFactory;
 
-public class ListFragment extends BaseFragment implements CurrencySelectedListener {
+public class ListFragment extends BaseFragment {
 
     @BindView(R.id.recyclerView)
     RecyclerView listView;
@@ -31,6 +30,7 @@ public class ListFragment extends BaseFragment implements CurrencySelectedListen
     @Inject
     ViewModelFactory viewModelFactory;
     private CurrencyListViewModel viewModel;
+    private CurrencyListAdapter currencyListAdapter;
 
     @Override
     protected int layoutRes() {
@@ -42,20 +42,30 @@ public class ListFragment extends BaseFragment implements CurrencySelectedListen
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(CurrencyListViewModel.class);
 
         listView.addItemDecoration(new DividerItemDecoration(getBaseActivity(), DividerItemDecoration.VERTICAL));
-        listView.setAdapter(new CurrencyListAdapter(viewModel, this, this));
+         currencyListAdapter = new CurrencyListAdapter(viewModel, this, new CurrencyUpdatedListener() {
+             @Override
+             public void onCurrencySelected(Currency currency) {
+                 listView.smoothScrollToPosition(0);
+                 viewModel.setSelectedCurrency(currency.name());
+                 listView.clearFocus();
+             }
+
+             @Override
+             public void onAmountUpdated(Double newAmount) {
+                 viewModel.setUpdatedAmount(newAmount);
+                 listView.clearFocus();
+             }
+         });
+        listView.setAdapter(currencyListAdapter);
         listView.setLayoutManager(new LinearLayoutManager(getContext()));
+
 
         observableViewModel();
     }
 
-    @Override
-    public void onRepoSelected(Currency currency) {
-        Toast.makeText(this.getContext(), " You selected : "+currency.name(),Toast.LENGTH_SHORT);
-    }
-
     private void observableViewModel() {
-        viewModel.getCurrencies().observe(this, repos -> {
-            if(repos != null) listView.setVisibility(View.VISIBLE);
+        viewModel.getCurrencies().observe(this, currencyList -> {
+            if(currencyList != null) listView.setVisibility(View.VISIBLE);
         });
 
         viewModel.getError().observe(this, isError -> {

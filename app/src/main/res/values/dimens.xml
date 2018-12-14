@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="flag_icon_size">48dp</dimen>
+    <dimen name="currency_item_height">64dp</dimen>
+    <dimen name="currency_item_padding">10dp</dimen>
+    <dimen name="currency_item_internal_margin">16dp</dimen>
+    <dimen name="currency_item_max_value_width">200dp</dimen>
+</resources>
