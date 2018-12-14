@@ -1,5 +1,4 @@
 package mk.android.com.livecurrencyconvertor.ui.util;
-
 import android.content.Context;
 import android.support.v7.widget.AppCompatEditText;
 import android.util.AttributeSet;

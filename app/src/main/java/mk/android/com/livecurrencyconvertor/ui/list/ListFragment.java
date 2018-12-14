@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import javax.inject.Inject;
 
@@ -47,7 +48,7 @@ public class ListFragment extends BaseFragment {
              public void onCurrencySelected(Currency currency) {
                  listView.smoothScrollToPosition(0);
                  viewModel.setSelectedCurrency(currency.name());
-                 listView.clearFocus();
+                 Toast.makeText(getContext(), " New currency selected '"+currency.name()+"'",Toast.LENGTH_SHORT).show();
              }
 
              @Override
