@@ -14,8 +14,6 @@ public abstract class Currency {
     @SerializedName("value")
     public abstract Double value();
 
-  //  abstract Currency withValue(Double value);
-
     public static Builder builder() {
         return new AutoValue_Currency.Builder();
     }

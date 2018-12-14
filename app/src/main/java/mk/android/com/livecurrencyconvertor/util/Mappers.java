@@ -17,8 +17,10 @@ public final class Mappers {
         }
     }
 
-    public static List<Currency> mapRemoteToLocal(CurrencyBaseDTO currencyBaseDTO){
+    public static List<Currency> mapRemoteToLocal(CurrencyBaseDTO currencyBaseDTO, String base){
         List<Currency> list = new ArrayList<>();
+        //Add 1st row as base, all currencies are with respect to base
+        list.add(Currency.builder().setName(base).setValue(1.0D).build());
         for(Map.Entry<String, Double> current: currencyBaseDTO.rates().entrySet())
             list.add(Currency.create(current.getKey(), current.getValue()));
         return list;

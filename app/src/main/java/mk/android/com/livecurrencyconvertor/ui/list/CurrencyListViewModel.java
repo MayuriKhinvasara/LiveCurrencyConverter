@@ -19,6 +19,7 @@ import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subscribers.DisposableSubscriber;
 import mk.android.com.livecurrencyconvertor.data.model.Currency;
 import mk.android.com.livecurrencyconvertor.data.rest.CurrencyRepository;
+import mk.android.com.livecurrencyconvertor.util.Constants;
 import mk.android.com.livecurrencyconvertor.util.Mappers;
 
 public class CurrencyListViewModel extends ViewModel {
@@ -30,9 +31,10 @@ public class CurrencyListViewModel extends ViewModel {
     private final MutableLiveData<List<Currency>> currencies = new MutableLiveData<>();
     private final MutableLiveData<Boolean> currencyLoadError = new MutableLiveData<>();
     private final MutableLiveData<Boolean> loading = new MutableLiveData<>();
+    private String currentBase = Constants.DEFAULT_CURRENCY_BASE;
 
     @Inject
-    private CurrencyListViewModel(CurrencyRepository currencyRepository) {
+    public CurrencyListViewModel(CurrencyRepository currencyRepository) {
         this.currencyRepository = currencyRepository;
         disposableSubscriber = getSubscriber();
         fetchCurrencies();
@@ -60,7 +62,7 @@ public class CurrencyListViewModel extends ViewModel {
                     .onBackpressureDrop()
                     .concatMap(n -> {
                            return currencyRepository.getCurrency()
-                                    .map(Mappers::mapRemoteToLocal)
+                                    .map(currencyBaseDTO -> Mappers.mapRemoteToLocal(currencyBaseDTO, currentBase))
                                     .toFlowable();
                                    })
                     .observeOn(AndroidSchedulers.mainThread())
