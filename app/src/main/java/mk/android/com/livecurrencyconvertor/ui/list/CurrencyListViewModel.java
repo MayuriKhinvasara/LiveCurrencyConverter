@@ -23,24 +23,26 @@ import mk.android.com.livecurrencyconvertor.util.Mappers;
 
 public class CurrencyListViewModel extends ViewModel {
 
+    private static final long CURRENCY_REFRESH_INTERVAL_SECONDS = 1;
     private final CurrencyRepository currencyRepository;
-    DisposableSubscriber<List<Currency>> disposableSubscriber;
+    private DisposableSubscriber<List<Currency>> disposableSubscriber;
 
-    private final MutableLiveData<List<Currency>> repos = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> repoLoadError = new MutableLiveData<>();
+    private final MutableLiveData<List<Currency>> currencies = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> currencyLoadError = new MutableLiveData<>();
     private final MutableLiveData<Boolean> loading = new MutableLiveData<>();
 
     @Inject
-    public CurrencyListViewModel(CurrencyRepository currencyRepository) {
+    private CurrencyListViewModel(CurrencyRepository currencyRepository) {
         this.currencyRepository = currencyRepository;
+        disposableSubscriber = getSubscriber();
         fetchCurrencies();
     }
 
-    LiveData<List<Currency>> getRepos() {
-        return repos;
+    LiveData<List<Currency>> getCurrencies() {
+        return currencies;
     }
     LiveData<Boolean> getError() {
-        return repoLoadError;
+        return currencyLoadError;
     }
     LiveData<Boolean> getLoading() {
         return loading;
@@ -49,26 +51,10 @@ public class CurrencyListViewModel extends ViewModel {
 
     private void fetchCurrencies() {
         loading.setValue(true);
-            Scheduler scheduler = Schedulers.from(Executors.newSingleThreadExecutor());
-         disposableSubscriber = new DisposableSubscriber<List<Currency>>() {
-            @Override
-            public void onNext(List<Currency> value) {
-                repoLoadError.setValue(false);
-                repos.setValue(value);
-                loading.setValue(false);
-            }
 
-            @Override
-            public void onError(Throwable t) {
-                repoLoadError.setValue(true);
-                loading.setValue(false);
-            }
-
-            @Override
-            public void onComplete() {
-            }
-        };
-        Flowable.interval(1, TimeUnit.SECONDS)
+        Scheduler scheduler = Schedulers.from(Executors.newSingleThreadExecutor());
+        /* Use rx flowable interval function to do periodic updates */
+        Flowable.interval(0,CURRENCY_REFRESH_INTERVAL_SECONDS, TimeUnit.SECONDS)
                     .subscribeOn(scheduler)
                     .mergeWith(publishSubject.toFlowable(BackpressureStrategy.DROP))
                     .onBackpressureDrop()
@@ -78,8 +64,31 @@ public class CurrencyListViewModel extends ViewModel {
                                     .toFlowable();
                                    })
                     .observeOn(AndroidSchedulers.mainThread())
+                    .retry(3)
                     .subscribe(disposableSubscriber);
         }
+
+    private DisposableSubscriber<List<Currency>> getSubscriber() {
+        /* Subscriber to update the data at regular intervals */
+        return  disposableSubscriber = new DisposableSubscriber<List<Currency>>() {
+           @Override
+           public void onNext(List<Currency> value) {
+               currencyLoadError.setValue(false);
+               currencies.setValue(value);
+               loading.setValue(false);
+           }
+
+           @Override
+           public void onError(Throwable t) {
+               currencyLoadError.setValue(true);
+               loading.setValue(false);
+           }
+
+           @Override
+           public void onComplete() {
+           }
+       };
+    }
 
     @Override
     protected void onCleared() {

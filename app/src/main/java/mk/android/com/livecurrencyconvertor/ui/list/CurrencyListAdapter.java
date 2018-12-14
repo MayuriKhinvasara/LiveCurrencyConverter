@@ -25,7 +25,7 @@ public class CurrencyListAdapter extends RecyclerView.Adapter<CurrencyListAdapte
 
     CurrencyListAdapter(CurrencyListViewModel viewModel, LifecycleOwner lifecycleOwner, CurrencySelectedListener currencySelectedListener) {
         this.currencySelectedListener = currencySelectedListener;
-        viewModel.getRepos().observe(lifecycleOwner, repos -> {
+        viewModel.getCurrencies().observe(lifecycleOwner, repos -> {
             data.clear();
             if (repos != null) {
                 data.addAll(repos);

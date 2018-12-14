@@ -14,6 +14,18 @@ public abstract class Currency {
     @SerializedName("value")
     public abstract Double value();
 
+  //  abstract Currency withValue(Double value);
+
+    public static Builder builder() {
+        return new AutoValue_Currency.Builder();
+    }
+    @AutoValue.Builder
+    public abstract static class Builder {
+        public abstract Builder setValue(Double value);
+        public abstract Builder setName(String name);
+        public abstract Currency build();
+    }
+
     public static Currency create(String name, Double value){
         return new AutoValue_Currency(name, value);
     }

@@ -54,7 +54,7 @@ public class ListFragment extends BaseFragment implements CurrencySelectedListen
     }
 
     private void observableViewModel() {
-        viewModel.getRepos().observe(this, repos -> {
+        viewModel.getCurrencies().observe(this, repos -> {
             if(repos != null) listView.setVisibility(View.VISIBLE);
         });
 
